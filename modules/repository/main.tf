@@ -21,9 +21,9 @@ resource "github_repository" "repo" {
 
 # Add a README file to the repository
 resource "github_repository_file" "readme" {
-  repository = github_repository.repo.name
-  file       = "README.md"
-  content    = <<-EOT
+  repository          = github_repository.repo.name
+  file                = "README.md"
+  content             = <<-EOT
 # 
 
 
@@ -57,9 +57,9 @@ EOT
 
 # Add a .gitignore file
 resource "github_repository_file" "gitignore" {
-  repository = github_repository.repo.name
-  file       = ".gitignore"
-  content    = <<-EOT
+  repository          = github_repository.repo.name
+  file                = ".gitignore"
+  content             = <<-EOT
 # Terraform
 *.tfstate
 *.tfstate.*

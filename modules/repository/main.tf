@@ -1,40 +1,29 @@
-# Repository module
-terraform {
-  required_providers {
-    git = {
-      source  = "paultyng/git"
-      version = "~> 0.1"
-    }
-  }
-}
 
-# Variables
-variable "repository_name" {
-  description = "Name of the repository"
+
+variable "github_token" {
+  description = "GitHub Personal Access Token"
   type        = string
+  sensitive   = true
 }
 
-variable "repository_description" {
-  description = "Description of the repository"
-  type        = string
+# Configure the GitHub Provider
+provider "github" {
+  token = var.github_token
 }
 
-variable "repository_url" {
-  description = "URL of the repository"
-  type        = string
+# GitHub repository resource
+resource "github_repository" "repo" {
+  name        = var.repository_name
+  description = var.repository_description
+  visibility  = "public"
+  auto_init   = true
 }
 
-# Git repository resource
-resource "git_repository" "repo" {
-  name = var.repository_name
-  url  = var.repository_url
-}
-
-# Add a file to the repository using git_file resource
-resource "git_file" "readme" {
-  repository = git_repository.repo.name
-  file       = "README.md"
-  content    = <<-EOT
+# Add a README file to the repository
+resource "github_repository_file" "readme" {
+  repository          = github_repository.repo.name
+  file                = "README.md"
+  content             = <<-EOT
 # 
 
 
@@ -60,13 +49,17 @@ This repository includes:
 - Additional files as managed by Terraform
 
 EOT
+  commit_message      = "Add README.md via Terraform"
+  commit_author       = "Terraform"
+  commit_email        = "terraform@example.com"
+  overwrite_on_create = true
 }
 
 # Add a .gitignore file
-resource "git_file" "gitignore" {
-  repository = git_repository.repo.name
-  file       = ".gitignore"
-  content    = <<-EOT
+resource "github_repository_file" "gitignore" {
+  repository          = github_repository.repo.name
+  file                = ".gitignore"
+  content             = <<-EOT
 # Terraform
 *.tfstate
 *.tfstate.*
@@ -96,4 +89,8 @@ vendor/
 .env.local
 .env.*.local
 EOT
+  commit_message      = "Add .gitignore via Terraform"
+  commit_author       = "Terraform"
+  commit_email        = "terraform@example.com"
+  overwrite_on_create = true
 }
